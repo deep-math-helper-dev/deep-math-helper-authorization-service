@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "pkg/api";
+
+service Authorization {
+    rpc Register(UserMeta) returns (SuccessfulRegister) {}
+}
+
+message UserMeta {
+    string  login = 1;
+    string  password = 2;
+}
+
+message SuccessfulRegister {
+    int32   id = 1;
+    string  login = 2;
+    string  password = 3;
+}
