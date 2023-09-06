@@ -3,6 +3,7 @@ module authorization
 go 1.21.0
 
 require (
+	github.com/vzglad-smerti/password_hash v0.0.0-20151126002249-16da77469e78
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 )
