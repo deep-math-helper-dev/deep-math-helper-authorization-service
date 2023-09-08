@@ -4,12 +4,16 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
-// FIXME!
-func AddMeta(login string, password string) *sql.Result {
-	db, err := sql.Open("sqlite3", "users.db")
+// Also FIXME!!
+type UserMeta struct {
+	DB *sql.DB
+}
+
+func (u *UserMeta) AddMeta(login string, password string) *sql.Result {
+	db, err := sql.Open("sqlite", "usersmeta.db")
 	if err != nil {
 		log.Fatal(err)
 	}
