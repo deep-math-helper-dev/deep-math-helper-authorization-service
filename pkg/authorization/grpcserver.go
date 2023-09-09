@@ -1,7 +1,7 @@
 package authorization
 
 import (
-	db "authorization/internal/databases"
+	"authorization/internal/db"
 	"authorization/pkg/api"
 	"context"
 	"log"
@@ -20,9 +20,7 @@ func (s *GRPCServer) Register(ctx context.Context, req *api.UserMeta) (*api.Succ
 		log.Fatal(err)
 	}
 
-	// Also FIXME!
-	add := db.UserMeta{}
-	add.AddMeta(strings.ToLower(req.GetLogin()), hash)
+	db.AddMeta(strings.ToLower(req.GetLogin()), hash)
 
 	return &api.SuccessfulRegister{Login: strings.ToLower(req.GetLogin()),
 		Password: hash}, nil
