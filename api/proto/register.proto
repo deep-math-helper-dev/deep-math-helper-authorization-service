@@ -6,6 +6,7 @@ option go_package = "pkg/api";
 
 service Authorization {
     rpc Register(UserMeta) returns (SuccessfulRegister) {}
+    rpc Auth(UserMeta) returns (LoggedIn) {}
 }
 
 message UserMeta {
@@ -17,4 +18,13 @@ message SuccessfulRegister {
     int32   id = 1;
     string  login = 2;
     string  password = 3;
+}
+
+message LoggedIn {
+    bool logged = 1;
+
+    enum actions {
+        DELETE_ACCOUNT = 0;
+        LOG_OUT = 1;
+    }
 }

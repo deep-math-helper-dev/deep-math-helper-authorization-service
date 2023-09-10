@@ -25,3 +25,7 @@ func (s *GRPCServer) Register(ctx context.Context, req *api.UserMeta) (*api.Succ
 	return &api.SuccessfulRegister{Login: strings.ToLower(req.GetLogin()),
 		Password: hash}, nil
 }
+
+func (s *GRPCServer) Auth(ctx context.Context, req *api.UserMeta) (*api.LoggedIn, error) {
+	return &api.LoggedIn{Logged: true}, nil
+}
