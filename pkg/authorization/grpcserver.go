@@ -2,12 +2,9 @@ package authorization
 
 import (
 	"authorization/internal/db"
+	"authorization/internal/entity"
 	"authorization/pkg/api"
 	"context"
-	"log"
-	"strings"
-
-	password "github.com/vzglad-smerti/password_hash"
 )
 
 type GRPCServer struct {
@@ -15,17 +12,7 @@ type GRPCServer struct {
 }
 
 func (s *GRPCServer) Register(ctx context.Context, req *api.UserMeta) (*api.SuccessfulRegister, error) {
-	hash, err := password.Hash(req.GetPassword())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db.AddMeta(strings.ToLower(req.GetLogin()), hash)
-
-	return &api.SuccessfulRegister{Login: strings.ToLower(req.GetLogin()),
-		Password: hash}, nil
-}
-
-func (s *GRPCServer) Auth(ctx context.Context, req *api.UserMeta) (*api.LoggedIn, error) {
-	return &api.LoggedIn{Logged: true}, nil
+	login, hash := entity.TakeData(req.GetLogin(), req.GetPassword()) // formatting users data
+	db.Add(login, hash)                                               // add data into db
+	return &api.SuccessfulRegister{Login: login, Password: hash}, nil // server response
 }
