@@ -6,8 +6,18 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func Add(login string, password string) { // func to add user into db
-	db, _ := sql.Open("sqlite", "usersmeta.db")                                    //open db
-	db.Exec("insert into Meta (login, password) values ($1, $2)", login, password) // insert
+var db, _ = sql.Open("sqlite", "storage.db")
+
+type User struct {
+	UserHash string
+}
+
+func (u User) Add() { // func to add user into db
+	db.Exec("insert into Meta (userHash) values ($1)", u.UserHash)
+	defer db.Close()
+}
+
+func (u User) Auth() {
+	db.Query("select * from Meta (userHash) where values ($1)", u.UserHash)
 	defer db.Close()
 }

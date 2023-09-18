@@ -11,8 +11,19 @@ type GRPCServer struct {
 	api.UnimplementedAuthorizationServer
 }
 
-func (s *GRPCServer) Register(ctx context.Context, req *api.UserMeta) (*api.SuccessfulRegister, error) {
-	login, hash := entity.TakeData(req.GetLogin(), req.GetPassword()) // formatting users data
-	db.Add(login, hash)                                               // add data into db
-	return &api.SuccessfulRegister{Login: login, Password: hash}, nil // server response
+func (s *GRPCServer) Register(ctx context.Context, req *api.UserMeta) (*api.SuccessfulResponse, error) {
+	hashedbymd5 := entity.GetMd5(req.GetLogin(), req.GetPassword())
+	newUser := db.User{UserHash: hashedbymd5}
+	newUser.Add()
+
+	return &api.SuccessfulResponse{Status: "200 OK!"}, nil // server response
+}
+
+func (s *GRPCServer) Auth(ctx context.Context, req *api.UserMeta) (*api.SuccessfulResponse, error) {
+
+	hashedbymd5 := entity.GetMd5(req.GetLogin(), req.GetPassword())
+	newUser := db.User{UserHash: hashedbymd5}
+	newUser.Auth()
+
+	return &api.SuccessfulResponse{Status: "200 OK!"}, nil // server response
 }

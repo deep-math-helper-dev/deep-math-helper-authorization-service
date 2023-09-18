@@ -31,11 +31,10 @@ Below is an example of how you can install a project
    ```
  4. Create database with name "usersmeta.db". And create the table:
        ```sh
-     $ CREATE TABLE "Meta" (
-	   $   "login"	TEXT NOT NULL UNIQUE,
-	   $   "password"	TEXT NOT NULL UNIQUE
-     $ );
-     $
+      $ CREATE TABLE "Meta" (
+	   $   "userHash"	TEXT NOT NULL UNIQUE
+      $ );
+      $
      ```
  5. Run server
      ```sh

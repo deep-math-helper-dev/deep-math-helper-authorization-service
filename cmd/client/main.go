@@ -30,5 +30,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println(res.GetLogin(), res.GetPassword())
+	log.Println(res.GetStatus())
 }

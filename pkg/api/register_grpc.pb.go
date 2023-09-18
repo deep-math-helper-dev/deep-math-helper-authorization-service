@@ -20,13 +20,15 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Authorization_Register_FullMethodName = "/api.Authorization/Register"
+	Authorization_Auth_FullMethodName     = "/api.Authorization/Auth"
 )
 
 // AuthorizationClient is the client API for Authorization service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorizationClient interface {
-	Register(ctx context.Context, in *UserMeta, opts ...grpc.CallOption) (*SuccessfulRegister, error)
+	Register(ctx context.Context, in *UserMeta, opts ...grpc.CallOption) (*SuccessfulResponse, error)
+	Auth(ctx context.Context, in *UserMeta, opts ...grpc.CallOption) (*SuccessfulResponse, error)
 }
 
 type authorizationClient struct {
@@ -37,9 +39,18 @@ func NewAuthorizationClient(cc grpc.ClientConnInterface) AuthorizationClient {
 	return &authorizationClient{cc}
 }
 
-func (c *authorizationClient) Register(ctx context.Context, in *UserMeta, opts ...grpc.CallOption) (*SuccessfulRegister, error) {
-	out := new(SuccessfulRegister)
+func (c *authorizationClient) Register(ctx context.Context, in *UserMeta, opts ...grpc.CallOption) (*SuccessfulResponse, error) {
+	out := new(SuccessfulResponse)
 	err := c.cc.Invoke(ctx, Authorization_Register_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizationClient) Auth(ctx context.Context, in *UserMeta, opts ...grpc.CallOption) (*SuccessfulResponse, error) {
+	out := new(SuccessfulResponse)
+	err := c.cc.Invoke(ctx, Authorization_Auth_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +61,8 @@ func (c *authorizationClient) Register(ctx context.Context, in *UserMeta, opts .
 // All implementations must embed UnimplementedAuthorizationServer
 // for forward compatibility
 type AuthorizationServer interface {
-	Register(context.Context, *UserMeta) (*SuccessfulRegister, error)
+	Register(context.Context, *UserMeta) (*SuccessfulResponse, error)
+	Auth(context.Context, *UserMeta) (*SuccessfulResponse, error)
 	mustEmbedUnimplementedAuthorizationServer()
 }
 
@@ -58,8 +70,11 @@ type AuthorizationServer interface {
 type UnimplementedAuthorizationServer struct {
 }
 
-func (UnimplementedAuthorizationServer) Register(context.Context, *UserMeta) (*SuccessfulRegister, error) {
+func (UnimplementedAuthorizationServer) Register(context.Context, *UserMeta) (*SuccessfulResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedAuthorizationServer) Auth(context.Context, *UserMeta) (*SuccessfulResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Auth not implemented")
 }
 func (UnimplementedAuthorizationServer) mustEmbedUnimplementedAuthorizationServer() {}
 
@@ -92,6 +107,24 @@ func _Authorization_Register_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Authorization_Auth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserMeta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServer).Auth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Authorization_Auth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServer).Auth(ctx, req.(*UserMeta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Authorization_ServiceDesc is the grpc.ServiceDesc for Authorization service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var Authorization_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Register",
 			Handler:    _Authorization_Register_Handler,
+		},
+		{
+			MethodName: "Auth",
+			Handler:    _Authorization_Auth_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
